@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unbound-dns
+spec:
+  selector:
+    matchLabels:
+      app: unbound-dns
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: unbound-dns
+    spec:
+      containers:
+        - name: unbound-dns
+          image: registry.cn-shenzhen.aliyuncs.com/amphineko/unbound:1.13.1
+          command:
+            - /usr/local/sbin/unbound
+            - -c
+            - /usr/local/etc/unbound/unbound.conf
+            - -d
+          ports:
+            - containerPort: 53
+              protocol: TCP
+            - containerPort: 53
+              protocol: UDP
+          # TODO: use `dig` to perform health check
+          # readinessProbe:
+          resources:
+            limits:
+              memory: "64M"
+          volumeMounts:
+            - mountPath: /usr/local/etc/unbound/unbound.conf
+              name: unbound-conf
+      tolerations:
+        - key: kubernetes.io/hostname
+          value: shirakami
+          effect: NoExecute
+      volumes:
+        - name: unbound-conf
+          hostPath:
+            # TODO: use nfs to retrieve configuration
+            path: /srv/containers/unbound/unbound.conf
+            type: File
