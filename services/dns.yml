@@ -1,27 +1,20 @@
-# Service with LoadBalancer type may not contain more than 1 protocol
-#
-# see https://github.com/kubernetes/kubernetes/issues/2995
-
 kind: Service
 apiVersion: v1
 metadata:
-  name: unbound-dns-udp
+  name: dns-udp
 spec:
   type: LoadBalancer
   ports:
     - name: dns-udp
       port: 53
       protocol: UDP
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
   selector:
-    app: unbound-dns
+    expose-service: dns
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: unbound-dns-tcp
+  name: dns-tcp
 spec:
   type: LoadBalancer
   ports:
@@ -29,4 +22,4 @@ spec:
       port: 53
       protocol: TCP
   selector:
-    app: unbound-dns
+    expose-service: dns
