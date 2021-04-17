@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdns-recursor
+spec:
+  selector:
+    matchLabels:
+      app: pdns-recursor
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: pdns-recursor
+        expose-service: dns
+    spec:
+      containers:
+        - name: pdns-recursor
+          image: registry.cn-shenzhen.aliyuncs.com/amphineko/pdns-recursor:4.4.3
+          env:
+            - name: RECURSOR_allow_from
+              value: "0.0.0.0/0, ::0/0"
+            - name: RECURSOR_ecs_add_for
+              value: "!0.0.0.0/0, !::/0"
+            - name: RECURSOR_local_address
+              value: "0.0.0.0, ::0"
+          ports:
+            - containerPort: 53
+              protocol: TCP
+            - containerPort: 53
+              protocol: UDP
+          # TODO: use `dig` to perform health check
+          # readinessProbe:
+          resources:
+            limits:
+              memory: "64M"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - shirakami
+      tolerations:
+        - key: kubernetes.io/hostname
+          value: shirakami
+          effect: NoExecute
+      volumes:
+        - name: unbound-conf
+          hostPath:
+            # TODO: use nfs to retrieve configuration
+            path: /srv/containers/unbound/unbound.conf
+            type: File
