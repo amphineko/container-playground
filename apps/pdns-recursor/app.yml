@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pdns-recursor
-          image: registry.cn-shenzhen.aliyuncs.com/amphineko/pdns-recursor:4.4.3
+          image: registry.cn-shenzhen.aliyuncs.com/amphineko/pdns-recursor:4.4.3-1
           env:
             - name: RECURSOR_allow_from
               value: "0.0.0.0/0, ::0/0"
@@ -32,6 +32,10 @@ spec:
           # readinessProbe:
           resources:
             limits:
+              cpu: "100m"
+              memory: "64M"
+            requests:
+              cpu: "0"
               memory: "64M"
       affinity:
         nodeAffinity:
