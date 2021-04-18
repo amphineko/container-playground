@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pdns-recursor
-          image: registry.cn-shenzhen.aliyuncs.com/amphineko/pdns-recursor:4.4.3-1
+          image: registry.cn-shenzhen.aliyuncs.com/amphineko/pdns-recursor:4.4.3-2
           env:
             - name: RECURSOR_allow_from
               value: "0.0.0.0/0, ::0/0"
