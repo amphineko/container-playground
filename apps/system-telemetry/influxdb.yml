@@ -1,0 +1,85 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-config
+  namespace: system-telemetry
+spec:
+  resources:
+    requests:
+      storage: "128Mi"
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-data
+  namespace: system-telemetry
+spec:
+  resources:
+    requests:
+      storage: "1Gi"
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: influxdb
+  name: influxdb
+  namespace: system-telemetry
+spec:
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+      namespace: system-telemetry
+    spec:
+      containers:
+        - name: influxdb
+          image: influxdb:2.0-alpine
+          ports:
+            - containerPort: 8086
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+            requests:
+              cpu: "0"
+              memory: "0"
+          volumeMounts:
+            - mountPath: /etc/influxdb2
+              name: influxdb-config
+            - mountPath: /var/lib/influxdb2
+              name: influxdb-data
+      volumes:
+        - name: influxdb-config
+          persistentVolumeClaim:
+            claimName: influxdb-config
+        - name: influxdb-data
+          persistentVolumeClaim:
+            claimName: influxdb-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+  namespace: system-telemetry
+spec:
+  selector:
+    app: influxdb
+  ports:
+    - port: 8086
+      targetPort: 8086
+      protocol: TCP
