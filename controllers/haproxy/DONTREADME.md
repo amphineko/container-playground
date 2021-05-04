@@ -9,6 +9,6 @@ Instead of digging into this problem, I would rather save my time and use someth
 
 ---
 
-Grammarly says you should capitialize `nginx`.
+Grammarly says you should capitalize `nginx`.
 
 ![Change the captialization](assets/ChangeTheCaptialization.png)
