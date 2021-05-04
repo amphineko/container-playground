@@ -32,27 +32,8 @@ spec:
           # readinessProbe:
           resources:
             limits:
-              cpu: "100m"
-              memory: "64M"
+              cpu: "500m"
+              memory: "256M"
             requests:
               cpu: "0"
-              memory: "64M"
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - shirakami
-      tolerations:
-        - key: kubernetes.io/hostname
-          value: shirakami
-          effect: NoExecute
-      volumes:
-        - name: unbound-conf
-          hostPath:
-            # TODO: use nfs to retrieve configuration
-            path: /srv/containers/unbound/unbound.conf
-            type: File
+              memory: "0"
