@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: unbound-dns
-  replicas: 2
+  replicas: 4
   template:
     metadata:
       labels:
@@ -18,9 +18,8 @@ spec:
           image: registry.cn-shenzhen.aliyuncs.com/amphineko/unbound:1.13.1
           command:
             - /usr/local/sbin/unbound
-            - -c
+            - -dc
             - /usr/local/etc/unbound/unbound.conf
-            - -d
           ports:
             - containerPort: 53
               protocol: TCP
@@ -30,17 +29,17 @@ spec:
           # readinessProbe:
           resources:
             limits:
-              memory: "64M"
+              cpu: "1000m"
+              memory: "512Mi"
+            requests:
+              cpu: "0"
+              memory: "0"
           volumeMounts:
             - mountPath: /usr/local/etc/unbound/unbound.conf
-              name: unbound-conf
-      tolerations:
-        - key: kubernetes.io/hostname
-          value: shirakami
-          effect: NoExecute
+              name: unbound-config
+              subPath: unbound.conf
+              readOnly: true
       volumes:
-        - name: unbound-conf
-          hostPath:
-            # TODO: use nfs to retrieve configuration
-            path: /srv/containers/unbound/unbound.conf
-            type: File
+        - name: unbound-config
+          configMap:
+            name: unbound-config
