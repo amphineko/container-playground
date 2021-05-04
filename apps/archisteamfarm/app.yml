@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: archisteamfarm-pvc
+spec:
+  resources:
+    requests:
+      storage: "512Mi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archisteamfarm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archisteamfarm
+  template:
+    metadata:
+      labels:
+        app: archisteamfarm
+    spec:
+      initContainers:
+        - name: archisteamfarm-init
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - "cp /initConfig/ASF.json /initConfig/IPC.config /app/config/"
+          volumeMounts:
+            - mountPath: /app/config
+              name: archisteamfarm-config
+            - mountPath: /initConfig/ASF.json
+              name: archisteamfarm-init-config
+              subPath: ASF.json
+              readOnly: true
+            - mountPath: /initConfig/IPC.config
+              name: archisteamfarm-init-config
+              subPath: IPC.config
+              readOnly: true
+      containers:
+        - name: archisteamfarm
+          image: justarchi/archisteamfarm:latest
+          resources:
+            limits:
+              cpu: "2000m"
+              memory: "1Gi"
+            requests:
+              cpu: "0"
+              memory: "0"
+          ports:
+            - containerPort: 1242
+          volumeMounts:
+            - mountPath: /app/config
+              name: archisteamfarm-config
+      volumes:
+        - name: archisteamfarm-init-config
+          configMap:
+            name: archisteamfarm-config
+        - name: archisteamfarm-config
+          persistentVolumeClaim:
+            claimName: archisteamfarm-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: archisteamfarm
+spec:
+  selector:
+    app: archisteamfarm
+  ports:
+    - port: 1242
+      targetPort: 1242

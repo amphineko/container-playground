@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: archisteamfarm-ingress
+spec:
+  rules:
+    - host: asf
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: archisteamfarm
+                port:
+                  number: 1242

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: archisteamfarm-config
+data:
+  ASF.json: |+
+    {
+        "AutoRestart": false,
+        "Headless": true,
+        "IPC": true,
+        "SteamTokenDumperPluginEnabled": true,
+        "s_SteamOwnerID": "76561198013029151"
+    }
+  IPC.config: |+
+    {
+        "Kestrel": {
+            "Endpoints": {
+                "http": {
+                    "Url": "http://*:1242"
+                }
+            }
+        }
+    }
