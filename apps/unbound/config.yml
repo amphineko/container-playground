@@ -2,14 +2,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: unbound-config
+  namespace: unbound
 data:
   unbound.conf: |+
     server:
         access-control: 0.0.0.0/0 allow
+        chroot: ""
         do-daemonize: no
         do-ip6: no
         interface-automatic: yes
-        num-threads: 1
+        num-threads: 4
         outgoing-num-tcp: 128
         pidfile: ""
         prefer-ip4: yes
@@ -28,7 +30,7 @@ data:
         prefetch: yes
 
         auto-trust-anchor-file: "/var/lib/unbound/root.key"
-        root-hints: "/usr/share/dns/root.hints"
+        root-hints: "/var/lib/unbound/named.root"
 
         key-cache-size: 16m
         key-cache-slabs: 1
