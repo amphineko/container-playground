@@ -7,8 +7,6 @@ metadata:
 spec:
   selector:
     app: unbound
-  externalIPs:
-    - "10.251.4.22"
   ports:
     - port: 53
       protocol: UDP
@@ -23,8 +21,6 @@ metadata:
 spec:
   selector:
     app: unbound
-  externalIPs:
-    - "10.251.4.22"
   ports:
     - port: 53
       protocol: TCP
