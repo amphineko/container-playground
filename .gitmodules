@@ -9,10 +9,11 @@
 [submodule "images/pdns-recursor"]
 	path = images/pdns-recursor
 	url = https://github.com/amphineko/docker-pdns-recursor
+	
+[submodule "images/unbound"]
+	path = images/unbound
+	url = https://github.com/amphineko/docker-unbound-dns
 
 [submodule "images/vlmcsd"]
 	path = images/vlmcsd
 	url = https://github.com/amphineko/docker-vlmcsd
-[submodule ".\\images\\unbound"]
-	path = .\\images\\unbound
-	url = https://github.com/amphineko/docker-unbound-dns
