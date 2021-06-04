@@ -1,0 +1,50 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: cloudflared
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+      namespace: cloudflared
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:2021.5.10
+          command:
+            - cloudflared
+            - tunnel
+            - --config
+            - /etc/cloudflared/config.yml
+            - --no-autoupdate
+            - run
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "0"
+              cpu: "0"
+          volumeMounts:
+            - mountPath: /etc/cloudflared/config.yml
+              name: config
+              subPath: config.yml
+              readOnly: true
+            - mountPath: /etc/cloudflared/credentials.json
+              name: credentials
+              subPath: credentials.json
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: cloudflared-config
+        - name: credentials
+          configMap:
+            name: cloudflared-config
