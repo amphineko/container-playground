@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: unbound-config
+  name: config
   namespace: unbound
 data:
   unbound.conf: |+

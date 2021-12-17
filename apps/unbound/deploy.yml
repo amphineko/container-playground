@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: unbound
+  name: unbound
+  namespace: unbound
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unbound
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: unbound
+    spec:
+      containers:
+        - name: unbound
+          image: ghcr.io/amphineko/unbound:1.14.0@sha256:12915a46c7d46a1953f0ab19905d550c86d94ee16689ff438ded003729f01cc1
+          command:
+            - /usr/local/sbin/unbound
+            - -dc
+            - /usr/local/etc/unbound/unbound.conf
+          ports:
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+          # TODO: use `dig` to perform health check
+          # readinessProbe:
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+          volumeMounts:
+            - mountPath: /usr/local/etc/unbound/unbound.conf
+              name: config
+              subPath: unbound.conf
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-dns-tcp
+  namespace: unbound
+spec:
+  selector:
+    app.kubernetes.io/name: unbound
+  ports:
+    - appProtocol: domain
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-dns-udp
+  namespace: unbound
+spec:
+  selector:
+    app.kubernetes.io/name: unbound
+  ports:
+    - appProtocol: domain
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+  type: LoadBalancer
