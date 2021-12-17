@@ -8,7 +8,13 @@ data:
   config.yml: |
     credentials-file: /etc/cloudflared/credentials.json
     ingress:
-      - service: http://haproxy-ingress.haproxy-controller.svc.cluster.local
+      - path: /.well-known/acme-challenge/
+        service: http://ingress-nginx-controller.ingress-nginx.svc.cluster.local:80
+      - originRequest:
+          connectTimeout: 5
+          noTLSVerify: true
+          tlsTimeout: 5
+        service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
     tunnel: <TUNNEL_ID>
   credentials.json: |
     {
