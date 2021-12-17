@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vlmcsd
+  namespace: vlmcsd
+  labels:
+    app.kubernetes.io/name: vlmcsd
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vlmcsd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vlmcsd
+    spec:
+      containers:
+        - name: vlmcsd
+          image: mikolatero/vlmcsd
+          ports:
+            - containerPort: 1688
+              name: kms-tcp
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "32M"
+            requests:
+              # request no resources, since vlmcsd is not critical
+              cpu: "0"
+              memory: "0"
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            tcpSocket:
+              port: 1688
+          # TODO: readiness probe using vlmcsd client
+          # readinessProbe:
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    metallb.universe.tf/allow-shared-ip: foo
+  name: vlmcsd-kms-tcp
+  namespace: vlmcsd
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: vlmcsd
+  ports:
+    - appProtocol: microsoft.com/kms
+      protocol: TCP
+      port: 1688
+      targetPort: kms-tcp
